@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# description: one time installer of RPMs that could not be installed on first boot because of dependencies.
+#
+### BEGIN INIT INFO
+# Provides:      install_rpms
+# Required-Start: 
+# Required-Stop: 
+# Should-Start: $all
+# Should-Stop:
+# Default-Start: 3
+# Default-Stop:
+# Description: one time installer of RPMs that could not be installed on first boot because of dependencies. 
+### END INIT INFO
+
+cd /tmp/rpms/; 
+
+for RPM in `ls`; 
+do 
+        rpm -Uvh --force --nodeps $RPM
+        if [ $? != 0 ];
+        then
+                rpm -Uvh --force --nodeps --noscripts $RPM
+        fi
+done
+
+for RPM in `ls`; 
+do 
+        rpm -Uvh --force --nodeps $RPM
+        if [ $? != 0 ];
+        then
+                rpm -Uvh --force --nodeps --noscripts $RPM
+        fi
+done
+
+
+cd /
+tar -xzvpf changed_rpm_files.tar.gz
+insserv -r install_rpms
+rm /etc/init.d/install_rpms
